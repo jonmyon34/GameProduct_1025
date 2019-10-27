@@ -8,12 +8,13 @@ public class PlayerMover : MonoBehaviour
     public Vector3 pos { get; private set; }
     const float MOVE_SPEED = 0.12f;
     const float TURN_SPEED = 0.4f;
-    const float JUMP_SPEED = 0.08f;
-    const float JUMP_DEC_SPEED = 0.004f;
+    const float JUMP_SPEED = 0.01f;
+    const float JUMP_DEC_SPEED = 0.0007f;
 
     private Vector3 velocity;
     private Vector3 rota;
     private float rotaY;
+    const float ROTA_X_VAL = 4.0f;
     const float ROTA_Y_VAL = 4.0f;
 
     private float jumpSpeed;
@@ -37,21 +38,24 @@ public class PlayerMover : MonoBehaviour
     public void ManagedUpdate ()
     {
 
-        if (Input.GetKey (KeyCode.A)) LeftTurn ();
-        if (Input.GetKey (KeyCode.D)) RightTurn ();
-        if (Input.GetKey (KeyCode.W)) ForwardMove ();
-        if (Input.GetKey (KeyCode.S)) BackMove ();
+        if (Input.GetKey (KeyCode.A))LeftTurn ();
+        if (Input.GetKey (KeyCode.D))RightTurn ();
+        if (Input.GetKey (KeyCode.W))ForwardMove ();
+        if (Input.GetKey (KeyCode.S))BackMove ();
 
-        if (!Input.GetKey (KeyCode.W) && !Input.GetKey (KeyCode.S)) NonMove ();
+        if (Input.GetKey (KeyCode.UpArrow))UpTurn ();
+        if (Input.GetKey (KeyCode.DownArrow))DownTurn ();
 
-        if (this.GetComponent<Rigidbody> () == null && isGround) //useGravityに変更する
+        if (!Input.GetKey (KeyCode.W) && !Input.GetKey (KeyCode.S))NonMove ();
+
+        if (!this.GetComponent<Rigidbody> ().useGravity && isGround) //useGravityに変更する
         {
-            if (Input.GetKeyDown (KeyCode.Space)) Jump ();
+            if (Input.GetKeyDown (KeyCode.Space))Jump ();
         }
-        else if (this.GetComponent<Rigidbody> () == null && !isGround)
+        else if (!this.GetComponent<Rigidbody> ().useGravity && !isGround)
         {
             Jumping ();
-            if (Input.GetKeyDown (KeyCode.Space) && !doubleJumping) DoubleJump ();
+            if (Input.GetKeyDown (KeyCode.Space) && !doubleJumping)DoubleJump ();
         }
 
         JumpMove ();
@@ -92,26 +96,34 @@ public class PlayerMover : MonoBehaviour
 
     void ForwardMove ()
     {
-        float rad = rotaY * Mathf.Deg2Rad;
+        // float rad = rotaY * Mathf.Deg2Rad;
 
-        float vx, vz;
-        vx = MOVE_SPEED * Mathf.Sin (rad);
-        vz = MOVE_SPEED * Mathf.Cos (rad);
+        // float vx, vz;
+        // vx = MOVE_SPEED * Mathf.Sin (rad);
+        // vz = MOVE_SPEED * Mathf.Cos (rad);
 
-        velocity.x = vx;
-        velocity.z = vz;
+        // velocity.x = vx;
+        // velocity.z = vz;
+
+        velocity.x = this.transform.forward.x * MOVE_SPEED;
+        velocity.z = this.transform.forward.z * MOVE_SPEED;
+
     }
 
     void BackMove ()
     {
-        float rad = rotaY * Mathf.Deg2Rad;
+        // float rad = rotaY * Mathf.Deg2Rad;
 
-        float vx, vz;
-        vx = MOVE_SPEED * Mathf.Sin (rad);
-        vz = MOVE_SPEED * Mathf.Cos (rad);
+        // float vx, vz;
+        // vx = MOVE_SPEED * Mathf.Sin (rad);
+        // vz = MOVE_SPEED * Mathf.Cos (rad);
 
-        velocity.x = -vx;
-        velocity.z = -vz;
+        // velocity.x = -vx;
+        // velocity.z = -vz;
+
+        velocity.x = this.transform.forward.x * -MOVE_SPEED;
+        velocity.z = this.transform.forward.z * -MOVE_SPEED;
+
     }
 
     private void LeftMove ()
@@ -126,16 +138,18 @@ public class PlayerMover : MonoBehaviour
             velocity.x += MOVE_SPEED;
     }
 
-    private void UpMove ()
+    private void UpTurn ()
     {
-        if (Input.GetKeyDown (KeyCode.W))
-            velocity.z += MOVE_SPEED;
+        float rotaX = rota.x;
+        rotaX -= ROTA_X_VAL;
+        rota.x = rotaX;
     }
 
-    private void DownMove ()
+    private void DownTurn ()
     {
-        if (Input.GetKeyDown (KeyCode.S))
-            velocity.z -= MOVE_SPEED;
+        float rotaX = rota.x;
+        rotaX += ROTA_X_VAL;
+        rota.x = rotaX;
     }
 
     private void Jump ()

@@ -4,24 +4,42 @@ using UnityEngine;
 
 public class PlayerLightUser : MonoBehaviour
 {
-    private bool isLightOn;
+    public bool isLightOn { get; private set; }
 
-    public void Init()
+    public void Init ()
     {
         isLightOn = false;
+        Illuminate();
     }
 
-    public void ManagedUpdate()
+    public void ManagedUpdate ()
     {
-        if(false)
+        if (Input.GetKeyDown (KeyCode.L))
         {
-            LightOnOff();
+            LightOnOff ();
+            Illuminate ();
         }
     }
 
-    void LightOnOff()
+    void LightOnOff ()
     {
         isLightOn = !isLightOn;
+    }
+
+    void Illuminate ()
+    {
+        if (isLightOn)
+        {
+            Light light = this.transform.Find ("Spot Light").gameObject.GetComponent<Light> ();
+            if (light != null)
+                light.enabled = isLightOn;
+        }
+        else if (!isLightOn)
+        {
+            Light light = this.transform.Find ("Spot Light").gameObject.GetComponent<Light> ();
+            if (light != null)
+                light.enabled = isLightOn;
+        }
     }
 
 }
